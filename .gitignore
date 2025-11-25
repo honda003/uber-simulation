@@ -1,0 +1,33 @@
+# Python virtual environments
+venv/
+env/
+.venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Python cache & bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.pip-cache/
+
+
+# Local testing files
+*.log
+test/
+temp/
+
+# Requirements (you don't want to commit if auto-generated)
+requirements.txt
+#secretes
+config.py
+secrets.py
+.env

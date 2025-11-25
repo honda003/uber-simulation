@@ -1,0 +1,34 @@
+{
+  "name" : "kafka-connect-gcs",
+  "version" : "10.1.10",
+  "title" : "Kafka Connect GCS",
+  "description" : "The GCS connector, currently available as a sink, allows you to export data from Kafka topics to GCS objects in either Avro or JSON formats.\n\nBeing a sink, the GCS connector periodically polls data from Kafka and in turn uploads it to GCS. A partitioner is used to split the data of every Kafka partition into chunks. Each chunk of data is represented as an GCS object, whose key name encodes the topic,\nthe Kafka partition and the start offset of this data chunk. If no partitioner is specified in the configuration, the default partitioner which preserves Kafka partitioning is used. The size of each data chunk is determined by the number of records written to GCS and by schema compatibility.\nIt is included in <a href=\"https://www.confluent.io/product/confluent-enterprise/\">Confluent Enterprise Platform</a>, or can be downloaded and installed separately. It can be used for free for 30 days, but after that does require an Enterprise license. <a href=\"https://www.confluent.io/contact/\">Contact Confluent</a> for more details.",
+  "owner" : {
+    "username" : "confluentinc",
+    "type" : "organization",
+    "name" : "Confluent, Inc.",
+    "url" : "https://confluent.io/"
+  },
+  "support" : {
+    "summary" : "This connector is a Confluent Commercial Connector and <a href=\"https://www.confluent.io/subscription/\">supported by Confluent</a>. The <connector-name> requires purchase of a <a href=\"https://www.confluent.io/product/confluent-platform/\">Confluent Platform</a> subscription, including a license to this Commercial Connector. You can also use this connector for a 30-day trial without an enterprise license key - after 30 days, you need to purchase a subscription. Please contact your Confluent account manager for details.",
+    "url" : "https://docs.confluent.io/current/",
+    "provider_name" : "Confluent, Inc."
+  },
+  "tags" : [ "cloud", "gcp", "gcs", "google", "storage", "platform" ],
+  "requirements" : [ "GCS bucket with write permissions" ],
+  "features" : {
+    "supported_encodings" : [ "any" ],
+    "single_message_transforms" : true,
+    "confluent_control_center_integration" : true,
+    "kafka_connect_api" : true
+  },
+  "logo" : "assets/googlecloud.png",
+  "documentation_url" : "https://docs.confluent.io/kafka-connect-gcs-sink/current/",
+  "docker_image" : { },
+  "license" : [ {
+    "name" : "Confluent Software Evaluation License",
+    "url" : "https://www.confluent.io/software-evaluation-license"
+  } ],
+  "component_types" : [ "sink" ],
+  "release_date" : "2024-04-25"
+}

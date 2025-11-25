@@ -1,0 +1,146 @@
+#******************************************************************************************************************************************************
+#******************************************************* services *************************************************************************************
+#******************************************************************************************************************************************************
+services:
+#====================================================================================================================================================
+#======================================================= kafka ======================================================================================
+#====================================================================================================================================================
+
+#=================================
+#======== Broker =================
+#=================================
+  broker:
+    image: confluentinc/cp-kafka:7.6.1
+    hostname: broker
+    container_name: broker
+    ports:
+      - "9092:9092"
+      - "9101:9101"
+      - "1234:1234"
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://broker:29092,PLAINTEXT_HOST://localhost:9092'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@broker:29093'
+      KAFKA_LISTENERS: 'PLAINTEXT://broker:29092,CONTROLLER://broker:29093,PLAINTEXT_HOST://0.0.0.0:9092'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      KAFKA_LOG_DIRS: '/tmp/kraft-combined-logs'
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+      KAFKA_OPTS: -javaagent:/tmp/jmx/jmx_prometheus_javaagent.jar=1234:/tmp/jmx/broker.yml
+      KAFKA_MESSAGE_MAX_BYTES: 1000000
+      KAFKA_REPLICA_FETCH_MAX_BYTES: 1000000
+    volumes:
+      - ./kafka/jmx:/tmp/jmx/
+    networks:
+      - data-net
+
+#=================================
+#======== Schema Registry ========
+#=================================
+
+  schema-registry:
+    image: confluentinc/cp-schema-registry:7.6.1
+    hostname: schema-registry
+    container_name: schema-registry
+    depends_on:
+      - broker
+    ports:
+      - "8081:8081"
+    environment:
+      SCHEMA_REGISTRY_HOST_NAME: schema-registry
+      SCHEMA_REGISTRY_KAFKASTORE_BOOTSTRAP_SERVERS: 'broker:29092'
+      SCHEMA_REGISTRY_LISTENERS: http://0.0.0.0:8081
+      SCHEMA_REGISTRY_KAFKASTORE_TOPIC: _schemas
+      SCHEMA_REGISTRY_KAFKASTORE_TOPIC_REPLICATION_FACTOR: 1
+      SCHEMA_REGISTRY_KAFKASTORE_TIMEOUT_MS: 5000 
+      SCHEMA_REGISTRY_JMX_OPTS: -javaagent:/tmp/jmx/jmx_prometheus_javaagent.jar=1234:/tmp/jmx/schema-registry.yml
+    volumes:
+      - ./kafka/jmx:/tmp/jmx/
+    networks:
+      - data-net
+
+#=================================
+#======== Kafka Connect ==========
+#=================================
+
+  connect:
+    image: confluentinc/cp-kafka-connect:7.7.1
+    hostname: connect
+    container_name: connect
+    depends_on:
+      - broker
+      - schema-registry
+    ports:
+      - "8083:8083"
+      - "1235:1234"
+    environment:
+      CONNECT_BOOTSTRAP_SERVERS: 'broker:29092'
+      CONNECT_REST_ADVERTISED_HOST_NAME: connect
+      CONNECT_GROUP_ID: compose-connect-group
+      CONNECT_CONFIG_STORAGE_TOPIC: docker-connect-configs
+      CONNECT_CONFIG_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_OFFSET_FLUSH_INTERVAL_MS: 10000
+      CONNECT_OFFSET_STORAGE_TOPIC: docker-connect-offsets
+      CONNECT_OFFSET_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_STATUS_STORAGE_TOPIC: docker-connect-status
+      CONNECT_STATUS_STORAGE_REPLICATION_FACTOR: 1
+      CONNECT_KEY_CONVERTER: org.apache.kafka.connect.storage.StringConverter
+      CONNECT_VALUE_CONVERTER: io.confluent.connect.avro.AvroConverter
+      CONNECT_VALUE_CONVERTER_SCHEMA_REGISTRY_URL: http://schema-registry:8081
+      CLASSPATH: /usr/share/java/monitoring-interceptors/monitoring-interceptors-7.6.1.jar
+      CONNECT_PRODUCER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringProducerInterceptor"
+      CONNECT_CONSUMER_INTERCEPTOR_CLASSES: "io.confluent.monitoring.clients.interceptor.MonitoringConsumerInterceptor"
+      CONNECT_PLUGIN_PATH: "/usr/share/java,/usr/share/confluent-hub-components,/tmp/ext-plugins,/tmp/clickhouse-jdbc"
+      CONNECT_LOG4J_LOGGERS: org.apache.zookeeper=ERROR,org.I0Itec.zkclient=ERROR,org.reflections=ERROR
+      CONNECT_PRODUCER_MAX_REQUEST_SIZE: 2097152
+      KAFKA_JMX_PORT: 9999
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_JMX_OPTS: "-javaagent:/tmp/jmx/jmx_prometheus_javaagent.jar=1234:/tmp/jmx/connect.yml -Dcom.sun.management.jmxremote=true -Dcom.sun.management.jmxremote.authenticate=false -Dcom.sun.management.jmxremote.ssl=false"
+      CONNECT_HEAP_OPTS: "-Xms1G -Xmx2G"
+      CONNECT_OFFSET_COMMIT_POLICY: "always"
+    volumes:
+      - ./kafka/plugins:/tmp/ext-plugins
+      - ./kafka/jmx:/tmp/jmx/
+      - ./kafka/jar/clickhouse-jdbc:/tmp/clickhouse-jdbc
+      - ./kafka/plugins/http-source:/usr/share/confluent-hub-components/http-source      
+    networks:
+      - data-net
+
+#=================================
+#======== Kafka UI ===============
+#=================================
+
+  kafka-ui:
+    container_name: kafka-ui
+    image: provectuslabs/kafka-ui:latest
+    platform: linux/amd64
+    ports:
+      - 8090:8080
+    depends_on:
+      - broker
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: broker:29092
+    networks:
+      - data-net
+
+
+
+#******************************************************************************************************************************************************
+#******************************************************* volumes & networks ***************************************************************************
+#******************************************************************************************************************************************************
+networks:
+  data-net:
+    driver: bridge
+
+#******************************************************************************************************************************************************
+#******************************************************************************************************************************************************
+#******************************************************************************************************************************************************
