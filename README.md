@@ -276,8 +276,6 @@ This project would not have been possible without the inspiration and guidance f
 - **Official AWS YouTube Video** – All MSK cluster creation, VPC/subnet configuration, EC2 setup, IAM roles, and security group settings were based on the excellent step-by-step tutorial from AWS itself:  
   [Deploy a Kafka Cluster on Amazon MSK](https://www.youtube.com/watch?v=5WaIgJwYpS8&t=232s)
 
-- Geohash-based matching technique is industry standard (used by Uber, Lyft, Careem, Bolt, etc.)
-
 **Thank you both for making complex streaming systems understandable and fun to break!**
 
 ---
