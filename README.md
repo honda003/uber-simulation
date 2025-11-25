@@ -265,3 +265,19 @@ python3 rider_producer.py &
 python3 match_rider_driver.py &
 python3 ride_confirmation_pricing.py &
 ```
+
+## Credits & Acknowledgments
+
+This project would not have been possible without the inspiration and guidance from the following sources:
+
+- Kafka Master **Eng. Karim Tawfik** – The original idea of building a real-time Uber-like simulation Kafka was inspired by his amazing content and teaching style. Huge respect and thanks!  
+  Follow him: [Linkedin - Karim Tawfik](https://www.linkedin.com/in/karim-tawfik-a8a3aa45/)
+
+- **Official AWS YouTube Video** – All MSK cluster creation, VPC/subnet configuration, EC2 setup, IAM roles, and security group settings were based on the excellent step-by-step tutorial from AWS itself:  
+  [Deploy a Kafka Cluster on Amazon MSK](https://www.youtube.com/watch?v=5WaIgJwYpS8&t=232s)
+
+- Geohash-based matching technique is industry standard (used by Uber, Lyft, Careem, Bolt, etc.)
+
+**Thank you both for making complex streaming systems understandable and fun to break!**
+
+---
