@@ -12,7 +12,9 @@ It is NOT a real production system — it is a *controlled simulation* designed 
 
 # 🚀 System Architecture Overview
 
-Simulation is made of *5 streaming steps*, each handled by 4 seperate python scripts.
+![Screenshot of architectures](images/aws_architecture.png)
+
+Simulation is made of *5 streaming steps*, handled by 4 seperate python scripts.
 
 The simulation generates:
 
@@ -213,7 +215,7 @@ This project was built and validated in *two phases*:
 - Storage: 1 GB EBS per broker (least resources)
 - Enabled *Basic Monitoring*  → essential to watch the broker's metrics
 
-Screen shot (cluster)
+![Screenshot of cluster configs](images/cluster_settings.png)
 
 #### 2. Launched EC2 Client Instance
 - Instance: t3.micro (Amazon Linux 2 Free Tier)
@@ -249,7 +251,7 @@ cd kafka_2.12-2.6.2
 ```
 
 Repeated for: rider-requests, ride-matches, ride-confirmations
-Screenshot (MSK Console):
+![Screenshot of cluster configs](images/topics.png)
 MSK Cluster & Topics Created
 
 #### 5. Transferred Python Scripts
